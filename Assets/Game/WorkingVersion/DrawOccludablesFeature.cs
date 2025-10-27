@@ -1,6 +1,8 @@
+﻿using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
+using ProfilingScope = UnityEngine.Rendering.ProfilingScope;
 
 public class DrawOccludablesFeature : ScriptableRendererFeature
 {
@@ -8,16 +10,19 @@ public class DrawOccludablesFeature : ScriptableRendererFeature
     public class Settings
     {
         [Tooltip("Layer that contains meshes you want to hide inside the volume.")]
-        public LayerMask occludableLayer = 0;
+        public LayerMask occludableLayer = 0; // which layer to draw
 
         [Tooltip("When this is true, the pass runs BeforeRenderingOpaques (recommended).")]
-        public bool beforeOpaques = true;
+        public bool beforeOpaques = true;  // when to insert the pass 
     }
 
     class DrawOccludablesPass : ScriptableRenderPass
     {
-        readonly ShaderTagId _tag = new ShaderTagId("UniversalForward");
-        FilteringSettings _filter;
+        //Only draw sub-passes whose LightMode tag is "UniversalForward".
+        // (URP/Lit uses this; for full coverage you might also include "UniversalForwardOnly" and "SRPDefaultUnlit".)
+        readonly ShaderTagId _tag = new ShaderTagId("UniversalForward"); 
+       
+        FilteringSettings _filter; //Opaque queue only (no transparents) and only the chosen layer.
         RenderStateBlock _stateBlock;
         ProfilingSampler _sampler = new ProfilingSampler("Draw Occludables (Stencil != 1)");
 
@@ -43,6 +48,8 @@ public class DrawOccludablesFeature : ScriptableRendererFeature
                 stencilReference = 1 // << IMPORTANT: compare against 1
             };
 
+
+            //where to run
             renderPassEvent = beforeOpaques ? RenderPassEvent.BeforeRenderingOpaques
                                             : RenderPassEvent.AfterRenderingOpaques;
         }
@@ -52,6 +59,18 @@ public class DrawOccludablesFeature : ScriptableRendererFeature
             _filter.layerMask = layer;
         }
 
+
+        /*Asks URP to draw culled renderers that match:
+
+            the LightMode tag (UniversalForward),
+
+            the filter (opaque queue + selected LayerMask),
+
+            and the stencil state (NotEqual 1).
+
+            No material override → it uses each object’s own material.
+
+         */
         public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
         {
             var cmd = CommandBufferPool.Get("Draw Occludables (Stencil != 1)");
@@ -73,11 +92,14 @@ public class DrawOccludablesFeature : ScriptableRendererFeature
     public Settings settings = new Settings();
     DrawOccludablesPass _pass;
 
+
+    //Instantiates the pass and enqueues it every frame so it runs at the specified event.
     public override void Create()
     {
         _pass = new DrawOccludablesPass(settings.occludableLayer, settings.beforeOpaques);
     }
 
+    //Instantiates the pass and enqueues it every frame so it runs at the specified event.
     public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
     {
         _pass.UpdateForFrame(settings.occludableLayer);
