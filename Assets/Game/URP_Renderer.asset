@@ -168,11 +168,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6b3d386ba5cd94485973aee1479b272e, type: 3}
-  m_Name: Occluduble Drawns
+  m_Name: Occluduble Drawns Cut
   m_EditorClassIdentifier: 
   m_Active: 1
   settings:
-    passTag: Occluduble Drawns
+    passTag: Occluduble Drawns Cut
     Event: 250
     filterSettings:
       RenderQueueType: 0
@@ -210,11 +210,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6b3d386ba5cd94485973aee1479b272e, type: 3}
-  m_Name: Occluduble DrawnsPipe
+  m_Name: Occluduble Drawns Pipe
   m_EditorClassIdentifier: 
   m_Active: 1
   settings:
-    passTag: Occluduble DrawnsPipe
+    passTag: Occluduble Drawns Pipe
     Event: 250
     filterSettings:
       RenderQueueType: 0
