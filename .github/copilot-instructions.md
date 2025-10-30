@@ -2,7 +2,7 @@
 - Project name: OcclusionCutout
 - Unity version: Unity 6000.0.39f1
 - Active game object:
-  - Name: Pipe
+  - Name: Cube
   - Tag: Untagged
-  - Layer: Pipe
+  - Layer: Occludable
 <!-- UNITY CODE ASSIST INSTRUCTIONS END -->
