@@ -1,47 +1,5 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-8192638440280994139
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6b3d386ba5cd94485973aee1479b272e, type: 3}
-  m_Name: Write Stencil Volumes Pipe
-  m_EditorClassIdentifier: 
-  m_Active: 1
-  settings:
-    passTag: Write Stencil Volumes Pipe
-    Event: 250
-    filterSettings:
-      RenderQueueType: 0
-      LayerMask:
-        serializedVersion: 2
-        m_Bits: 512
-      PassNames: []
-    overrideMaterial: {fileID: 2100000, guid: 97d8f3145c6dd2743823fd1b7c54e88e, type: 2}
-    overrideMaterialPassIndex: 0
-    overrideShader: {fileID: 0}
-    overrideShaderPassIndex: 0
-    overrideMode: 1
-    overrideDepthState: 1
-    depthCompareFunction: 4
-    enableWrite: 1
-    stencilSettings:
-      overrideStencilState: 0
-      stencilReference: 2
-      stencilCompareFunction: 8
-      passOperation: 2
-      failOperation: 0
-      zFailOperation: 0
-    cameraSettings:
-      overrideCamera: 0
-      restoreCamera: 1
-      offset: {x: 0, y: 0, z: 0, w: 0}
-      cameraFieldOfView: 60
 --- !u!114 &-6609474791026008378
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -172,10 +130,9 @@ MonoBehaviour:
   m_RendererFeatures:
   - {fileID: -6609474791026008378}
   - {fileID: 8977464859203086925}
-  - {fileID: -8192638440280994139}
   - {fileID: 8982144577772119976}
   - {fileID: -4069289382489754232}
-  m_RendererFeatureMap: c6defe30b26d46a44d2a5a8cb95c967ca54ed7b9bee64d8ea8e74e6fe7fca67c88f56ddcddfa86c7
+  m_RendererFeatureMap: c6defe30b26d46a44d2a5a8cb95c967ca8e74e6fe7fca67c88f56ddcddfa86c7
   m_UseNativeRenderPass: 0
   xrSystemData: {fileID: 0}
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
@@ -229,14 +186,14 @@ MonoBehaviour:
     overrideShaderPassIndex: 0
     overrideMode: 0
     overrideDepthState: 0
-    depthCompareFunction: 6
+    depthCompareFunction: 8
     enableWrite: 0
     stencilSettings:
       overrideStencilState: 1
       stencilReference: 1
       stencilCompareFunction: 6
       passOperation: 0
-      failOperation: 1
+      failOperation: 0
       zFailOperation: 0
     cameraSettings:
       overrideCamera: 0
