@@ -69,12 +69,12 @@ MonoBehaviour:
     overrideShader: {fileID: 0}
     overrideShaderPassIndex: 0
     overrideMode: 0
-    overrideDepthState: 0
-    depthCompareFunction: 4
+    overrideDepthState: 1
+    depthCompareFunction: 5
     enableWrite: 0
     stencilSettings:
       overrideStencilState: 0
-      stencilReference: 0
+      stencilReference: 6
       stencilCompareFunction: 8
       passOperation: 0
       failOperation: 0
