@@ -3,7 +3,7 @@
     Tags { "Queue"="Geometry-20" "RenderType"="Opaque" } //-20 means 2000-20 which means that the stencil is written before the normal wall and opther stuff.
     Pass {
       ZTest LEqual //every covered pixel passes the depth test, even if the sphere is “behind” other geometry
-      ZWrite On //don’t modify the depth buffer. We’re not trying to occlude anything—only tagging stencil
+      ZWrite Off //don’t modify the depth buffer. We’re not trying to occlude anything—only tagging stencil
       ColorMask 0 //write no color channels
       Cull Front
 

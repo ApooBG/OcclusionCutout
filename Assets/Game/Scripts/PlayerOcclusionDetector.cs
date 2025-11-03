@@ -17,6 +17,10 @@ public class PlayerOcclusionDetector : MonoBehaviour
     public float baseRadius = 1.0f;
     public string occludableLayerName = "Occludable";
 
+    [Header("Fine-tune alignment")]
+    [SerializeField] private float offsetUp = 0.5f;       // Moves it vertically
+    [SerializeField] private float offsetForward = 0.0f;  // Moves it along the ray
+
     private readonly Dictionary<Transform, int> originalLayers = new();
     private List<Transform> currentOccluders = new();
 
@@ -30,40 +34,56 @@ public class PlayerOcclusionDetector : MonoBehaviour
         Vector3 direction = (playerHeadPos - camPos).normalized;
         float distance = Vector3.Distance(camPos, playerHeadPos);
 
-        // 🔹 Get all hits between camera and player
-        RaycastHit[] hits = Physics.RaycastAll(camPos, direction, distance, ~0, QueryTriggerInteraction.Ignore);
 
-        // Filter out player hits
-        hits = hits.Where(h => h.transform != player && !h.transform.IsChildOf(player)).ToArray();
+        // get all hits along the ray
+        RaycastHit[] hits = Physics.RaycastAll(camPos, direction, distance, ~0, QueryTriggerInteraction.Ignore);
+        hits = hits.Where(h => h.transform != player && !h.transform.IsChildOf(player)).OrderBy(h => h.distance).ToArray();
 
         if (hits.Length > 0)
         {
             Debug.DrawLine(camPos, playerHeadPos, occludedColor);
-
             if (!cylinderOcclusion.activeSelf)
                 cylinderOcclusion.SetActive(true);
 
-            // Handle layers for all occluding objects
             HandleOccluders(hits.Select(h => h.transform).ToList());
 
-            // 🔹 Find entry and exit points through all occluders
             Vector3 entryPoint = hits.First().point;
-            Vector3 exitPoint = hits.Last().point;
-            float totalThickness = Vector3.Distance(entryPoint, exitPoint);
+            Vector3 exitPoint;
+
+            // ✅ if there are multiple occluding colliders, use the farthest one
+            if (hits.Length > 1)
+                exitPoint = hits.Last().point;
+            else
+            {
+                // ✅ otherwise, shoot a second ray *through the same collider*
+                Collider c = hits[0].collider;
+                Vector3 insideStart = entryPoint + direction * 0.01f;
+                if (c.Raycast(new Ray(insideStart, direction), out RaycastHit exitHit, distance))
+                    exitPoint = exitHit.point;
+                else
+                    // fallback: extend a small distance so thickness never becomes zero
+                    exitPoint = entryPoint + direction * 0.5f;
+            }
+
+            float totalThickness = Mathf.Max(Vector3.Distance(entryPoint, exitPoint), 0.05f);
             Vector3 midPoint = (entryPoint + exitPoint) * 0.5f;
 
-            // 🔹 Correct rotation and positioning along ray direction
-            cylinderOcclusion.transform.position = Vector3.Lerp(
-                cylinderOcclusion.transform.position, midPoint, Time.deltaTime * moveSmoothness);
-
+            // rotation and scale
             cylinderOcclusion.transform.rotation = Quaternion.LookRotation(direction, Vector3.up);
             cylinderOcclusion.transform.localScale = new Vector3(baseRadius, totalThickness * 0.5f, baseRadius);
+
+            // small manual vertical tweak (if you still need it)
+            Vector3 targetPos = midPoint + Vector3.up * offsetUp + direction * offsetForward;
+
+            cylinderOcclusion.transform.position = Vector3.Lerp(
+                cylinderOcclusion.transform.position, targetPos, Time.deltaTime * moveSmoothness);
         }
         else
         {
             ClearOccluders();
             HideCylinder(camPos, playerHeadPos);
         }
+
     }
 
     private void HandleOccluders(List<Transform> occluders)
