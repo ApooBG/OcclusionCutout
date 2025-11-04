@@ -69,14 +69,14 @@ public class PlayerOcclusionDetector : MonoBehaviour
             Vector3 midPoint = (entryPoint + exitPoint) * 0.5f;
 
             // rotation and scale
-            cylinderOcclusion.transform.rotation = Quaternion.LookRotation(direction, Vector3.up);
-            cylinderOcclusion.transform.localScale = new Vector3(baseRadius, totalThickness * 0.5f, baseRadius);
+            //cylinderOcclusion.transform.rotation = Quaternion.LookRotation(direction, Vector3.up);
+            //cylinderOcclusion.transform.localScale = new Vector3(baseRadius, totalThickness * 0.5f, baseRadius);
 
             // small manual vertical tweak (if you still need it)
             Vector3 targetPos = midPoint + Vector3.up * offsetUp + direction * offsetForward;
 
-            cylinderOcclusion.transform.position = Vector3.Lerp(
-                cylinderOcclusion.transform.position, targetPos, Time.deltaTime * moveSmoothness);
+            //cylinderOcclusion.transform.position = Vector3.Lerp(
+              //  cylinderOcclusion.transform.position, targetPos, Time.deltaTime * moveSmoothness);
         }
         else
         {
