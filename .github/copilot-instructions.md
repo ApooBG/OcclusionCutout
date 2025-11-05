@@ -2,7 +2,7 @@
 - Project name: OcclusionCutout
 - Unity version: Unity 6000.0.39f1
 - Active game object:
-  - Name: PipeInterior (1)
+  - Name: CameraOcclusionChecker
   - Tag: Untagged
-  - Layer: PipeInterior
+  - Layer: Default
 <!-- UNITY CODE ASSIST INSTRUCTIONS END -->

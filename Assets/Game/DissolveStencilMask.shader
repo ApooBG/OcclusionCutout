@@ -1,16 +1,19 @@
-Shader "Hidden/PipeDissolve_Background"
+﻿Shader "Hidden/PipeDissolve_DarkenCombined"
 {
     Properties
     {
         _NoiseTex("Noise Texture", 2D) = "white" {}
-        _BackgroundTex("Background", 2D) = "white" {} // RenderTexture from second cam
+        _BackgroundTex("Background", 2D) = "white" {}
         _DissolveThreshold("Dissolve Threshold", Range(0,1)) = 0.5
         _EdgeWidth("Edge Width", Range(0,0.2)) = 0.05
         _EdgeColor("Edge Color", Color) = (1,1,1,1)
+        _DarkenAlpha("Darken Alpha", Range(0,1)) = 0.4
     }
+
     SubShader
     {
         Tags { "Queue"="Transparent+3" "RenderType"="Transparent" }
+
         Pass
         {
             ZWrite Off
@@ -35,11 +38,11 @@ Shader "Hidden/PipeDissolve_Background"
             float _DissolveThreshold;
             float _EdgeWidth;
             float4 _EdgeColor;
+            float _DarkenAlpha;
 
             struct Attributes
             {
                 float4 positionOS : POSITION;
-                float3 normalOS : NORMAL;
             };
 
             struct Varyings
@@ -49,7 +52,7 @@ Shader "Hidden/PipeDissolve_Background"
                 float4 screenPos : TEXCOORD1;
             };
 
-            Varyings vert (Attributes IN)
+            Varyings vert(Attributes IN)
             {
                 Varyings OUT;
                 OUT.positionHCS = TransformObjectToHClip(IN.positionOS.xyz);
@@ -58,7 +61,7 @@ Shader "Hidden/PipeDissolve_Background"
                 return OUT;
             }
 
-            half4 frag (Varyings IN) : SV_Target
+            half4 frag(Varyings IN) : SV_Target
             {
                 float2 noiseUV = IN.worldPos.xz * 0.5;
                 float noise = tex2D(_NoiseTex, noiseUV).r;
@@ -72,9 +75,10 @@ Shader "Hidden/PipeDissolve_Background"
                 float2 screenUV = IN.screenPos.xy / IN.screenPos.w;
                 float3 bg = tex2D(_BackgroundTex, screenUV).rgb;
 
-                float3 color = lerp(_EdgeColor.rgb, bg, edge);
-                float alpha = lerp(0.4, 1.0, edge);
-                return float4(color, alpha);
+                float3 finalColor = lerp(_EdgeColor.rgb, bg, edge);
+                float finalAlpha = lerp(_DarkenAlpha, 1.0, edge);
+
+                return float4(finalColor, finalAlpha);
             }
             ENDHLSL
         }
