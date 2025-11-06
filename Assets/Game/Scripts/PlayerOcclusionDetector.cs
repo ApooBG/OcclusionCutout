@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using System.Collections;
+using UnityEngine.ProBuilder.Shapes;
 
 public class PlayerOcclusionDetector : MonoBehaviour
 {
@@ -15,6 +17,9 @@ public class PlayerOcclusionDetector : MonoBehaviour
     public float headHeight = 1.0f;
     public float moveSmoothness = 10f;
     public float baseRadius = 1.0f;
+    public float scaleUpTime = 0.3f;
+    [SerializeField, Tooltip("How wide the raycast should be to detect nearby walls.")]
+    private float occlusionCheckRadius = 0.3f; // You can tune this in the inspector
     public string occludableLayerName = "Occludable";
 
     [Header("Fine-tune alignment")]
@@ -23,6 +28,15 @@ public class PlayerOcclusionDetector : MonoBehaviour
 
     private readonly Dictionary<Transform, int> originalLayers = new();
     private List<Transform> currentOccluders = new();
+    Vector3 targetScale;
+
+
+    private Coroutine currentAnim;
+
+    private void Start()
+    {
+        targetScale = cylinderOcclusion.transform.localScale;
+    }
 
     void Update()
     {
@@ -34,16 +48,41 @@ public class PlayerOcclusionDetector : MonoBehaviour
         Vector3 direction = (playerHeadPos - camPos).normalized;
         float distance = Vector3.Distance(camPos, playerHeadPos);
 
-
         // get all hits along the ray
-        RaycastHit[] hits = Physics.RaycastAll(camPos, direction, distance, ~0, QueryTriggerInteraction.Ignore);
+        // use spherecast instead of single ray to catch nearby geometry
+        RaycastHit[] hits;
+
+        if (occlusionCheckRadius > 0f)
+        {
+            // SphereCastAll detects wider walls / corners
+            hits = Physics.SphereCastAll(camPos, occlusionCheckRadius, direction, distance, ~0, QueryTriggerInteraction.Ignore);
+        }
+        else
+        {
+            // fallback to regular raycast if radius = 0
+            hits = Physics.RaycastAll(camPos, direction, distance, ~0, QueryTriggerInteraction.Ignore);
+        }
+
+        hits = hits
+            .Where(h => h.transform != player && !h.transform.IsChildOf(player))
+            .OrderBy(h => h.distance)
+            .ToArray();
+
         hits = hits.Where(h => h.transform != player && !h.transform.IsChildOf(player)).OrderBy(h => h.distance).ToArray();
 
         if (hits.Length > 0)
         {
             Debug.DrawLine(camPos, playerHeadPos, occludedColor);
+
             if (!cylinderOcclusion.activeSelf)
+            {
                 cylinderOcclusion.SetActive(true);
+
+                // start scale-up animation each time it’s activated
+                if (currentAnim != null)
+                    StopCoroutine(currentAnim);
+                currentAnim = StartCoroutine(ScaleUpCylinderAnimation(cylinderOcclusion));
+            }
 
             HandleOccluders(hits.Select(h => h.transform).ToList());
 
@@ -76,14 +115,33 @@ public class PlayerOcclusionDetector : MonoBehaviour
             Vector3 targetPos = midPoint + Vector3.up * offsetUp + direction * offsetForward;
 
             //cylinderOcclusion.transform.position = Vector3.Lerp(
-              //  cylinderOcclusion.transform.position, targetPos, Time.deltaTime * moveSmoothness);
+            //    cylinderOcclusion.transform.position, targetPos, Time.deltaTime * moveSmoothness);
         }
         else
         {
             ClearOccluders();
             HideCylinder(camPos, playerHeadPos);
         }
+    }
 
+    private IEnumerator ScaleUpCylinderAnimation(GameObject cylinder)
+    {
+        // Store original (target) scale
+
+        // Start from tiny
+        cylinder.transform.localScale = new Vector3(0.01f, 0.01f, 0.01f);
+
+        float elapsed = 0f;
+        while (elapsed < scaleUpTime)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / scaleUpTime);
+            t = Mathf.SmoothStep(0, 1, t); // ease-in-out curve
+            cylinder.transform.localScale = Vector3.Lerp(cylinder.transform.localScale, targetScale, t);
+            yield return null;
+        }
+
+        cylinder.transform.localScale = targetScale;
     }
 
     private void HandleOccluders(List<Transform> occluders)
