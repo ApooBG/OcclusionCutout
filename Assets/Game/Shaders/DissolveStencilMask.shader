@@ -45,6 +45,8 @@
                 float4 positionOS : POSITION;
             };
 
+
+            //Defines the data passed from the vertex shader to the fragment shader.
             struct Varyings
             {
                 float4 positionHCS : SV_POSITION;
@@ -52,6 +54,8 @@
                 float4 screenPos : TEXCOORD1;
             };
 
+
+            //This is the vertex shader, which transforms each vertex from object space to various coordinate spaces needed later.
             Varyings vert(Attributes IN)
             {
                 Varyings OUT;
@@ -61,6 +65,22 @@
                 return OUT;
             }
 
+            //This is the fragment (pixel) shader, which determines the final color and transparency of each pixel.
+            /*
+                Samples a noise texture based on world position to create a random dissolve pattern.
+
+                Compares the noise value to _DissolveThreshold to determine which pixels dissolve (using discard).
+
+                Uses smoothstep() to create a soft transition (edge effect) around the dissolve boundary.
+
+                Samples a background texture using the screen-space position.
+
+                Blends (lerp) between the edge color and background based on how close the pixel is to the dissolve edge.
+
+                Adjusts the pixel’s alpha (transparency) for a fading effect.
+
+                Returns the final RGBA color to render.
+            */
             half4 frag(Varyings IN) : SV_Target
             {
                 float2 noiseUV = IN.worldPos.xz * 0.5;
