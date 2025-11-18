@@ -1,45 +1,73 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class HideIfNotOccController : MonoBehaviour
 {
-    [SerializeField] List<HideIfNotOccludable> pipes;
-    bool renderedBeforeCamera = false;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    [SerializeField] private List<HideIfNotOccludable> pipes;
+
+    [Header("Smoothing")]
+    [SerializeField] private float smoothSpeed = 12f;
+
+    // index boundary between visible and hidden segments
+    private float smoothedLastOccIndex;
+
+    private void Start()
     {
-        
+        // start with all visible
+        smoothedLastOccIndex = pipes.Count - 1;
     }
 
-    // Update is called once per frame
-    void LateUpdate()
+    private void LateUpdate()
     {
-        CheckCollision();
+        UpdateVisibility();
     }
 
-    void CheckCollision()
+    private void UpdateVisibility()
     {
-        int i = -1;
-        foreach (var pipe in pipes)
+        int lastOccIndex = -1;
+
+        // find last pipe that collides with an occludable object
+        for (int i = 0; i < pipes.Count; i++)
         {
-            i++;
-            if (pipe.isColliding)
+            if (pipes[i].isColliding)
+                lastOccIndex = i;
+        }
+
+        // if nothing is colliding: keep everything ON
+        if (lastOccIndex == -1)
+        {
+            smoothedLastOccIndex = Mathf.Lerp(
+                smoothedLastOccIndex,
+                pipes.Count - 1,
+                Time.deltaTime * smoothSpeed
+            );
+        }
+        else
+        {
+            smoothedLastOccIndex = Mathf.Lerp(
+                smoothedLastOccIndex,
+                lastOccIndex,
+                Time.deltaTime * smoothSpeed
+            );
+        }
+
+        ApplyVisibility();
+    }
+
+    private void ApplyVisibility()
+    {
+        for (int i = 0; i < pipes.Count; i++)
+        {
+            if (i <= smoothedLastOccIndex)
             {
-                pipe.Show();
-                ShowPrevious(i);
+                // from camera up to last occluder → visible
+                pipes[i].Show();
             }
             else
             {
-                pipe.Hide();
+                // between last occluder and player → hidden
+                pipes[i].Hide();
             }
-        }   
-    }
-
-    void ShowPrevious(int numberInList)
-    {
-        for (int i = numberInList; i > 0; i--)
-        {
-            pipes[i].Show();
         }
     }
 }

@@ -6,24 +6,39 @@ public class HideIfNotOccludable : MonoBehaviour
     public MeshRenderer pipeInterior;
     public LayerMask layerMaskOccludable;
 
-    public bool isColliding = false;
+    [Header("Collision Settings")]
+    public BoxCollider box;        // assign in inspector
+    public float overlapShrink = 0.05f;
 
-    private void OnTriggerEnter(Collider other)
+    [HideInInspector] public bool isColliding;
+
+    private void Reset()
     {
-        if (((1 << other.gameObject.layer) & layerMaskOccludable) != 0)
-        {
-            //Show();
-            isColliding = true;
-        }
+        box = GetComponent<BoxCollider>();
     }
 
-    private void OnTriggerExit(Collider other)
+    private void Start()
     {
-        if (((1 << other.gameObject.layer) & layerMaskOccludable) != 0)
-        {
-            //Hide();
-            isColliding = false;
-        }
+        // we only use the box as a template for size/position
+        if (box != null)
+            box.enabled = false;
+    }
+
+    private void Update()
+    {
+        if (box == null)
+            return;
+
+        Vector3 center = transform.TransformPoint(box.center);
+        Vector3 halfSize = Vector3.Scale(box.size * 0.5f, transform.lossyScale) - Vector3.one * overlapShrink;
+
+        isColliding = Physics.CheckBox(
+            center,
+            halfSize,
+            transform.rotation,
+            layerMaskOccludable,
+            QueryTriggerInteraction.Ignore
+        );
     }
 
     public void Show()
