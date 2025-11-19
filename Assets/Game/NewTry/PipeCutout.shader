@@ -1,15 +1,22 @@
-Shader "Hidden/PipeClipSceneColor"
+Shader "Hidden/PipeStencilWrite"
 {
     Properties {}
     SubShader
     {
-        Tags { "Queue"="Geometry" }
+        Tags { "Queue"="Geometry" "RenderType"="Opaque" }
         Pass
         {
             Cull Front
             ZTest LEqual
             ZWrite Off
-            ColorMask RGB
+            ColorMask 0
+
+            Stencil
+            {
+                Ref 3
+                Comp Always
+                Pass Replace
+            }
 
             HLSLPROGRAM
             #pragma vertex vert
@@ -20,15 +27,11 @@ Shader "Hidden/PipeClipSceneColor"
             struct v2f {
                 float4 pos : SV_POSITION;
                 float3 worldPos : TEXCOORD0;
-                float4 screenPos : TEXCOORD1;
             };
 
             int _BoundsCount;
             float4 _BoundsCenters[32];
             float4 _BoundsExtents[32];
-
-            TEXTURE2D(_CameraOpaqueTexture);
-            SAMPLER(sampler_CameraOpaqueTexture);
 
             v2f vert(appdata v)
             {
@@ -36,7 +39,6 @@ Shader "Hidden/PipeClipSceneColor"
                 float3 wp = TransformObjectToWorld(v.vertex.xyz);
                 o.pos = TransformWorldToHClip(wp);
                 o.worldPos = wp;
-                o.screenPos = ComputeScreenPos(o.pos);
                 return o;
             }
 
@@ -56,9 +58,7 @@ Shader "Hidden/PipeClipSceneColor"
             {
                 if (!insideAnyBounds(i.worldPos))
                     discard;
-
-                float2 uv = i.screenPos.xy / i.screenPos.w;
-                return SAMPLE_TEXTURE2D(_CameraOpaqueTexture, sampler_CameraOpaqueTexture, uv);
+                return 0;
             }
             ENDHLSL
         }
