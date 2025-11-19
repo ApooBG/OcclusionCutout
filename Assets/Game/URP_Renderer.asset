@@ -132,7 +132,8 @@ MonoBehaviour:
   - {fileID: 8977464859203086925}
   - {fileID: 8982144577772119976}
   - {fileID: -4069289382489754232}
-  m_RendererFeatureMap: c6defe30b26d46a44d2a5a8cb95c967ca8e74e6fe7fca67c88f56ddcddfa86c7
+  - {fileID: 5644432135983417205}
+  m_RendererFeatureMap: c6defe30b26d46a44d2a5a8cb95c967ca8e74e6fe7fca67c88f56ddcddfa86c7754717481f0d554e
   m_UseNativeRenderPass: 0
   xrSystemData: {fileID: 0}
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
@@ -158,6 +159,20 @@ MonoBehaviour:
   m_DepthTextureFormat: 0
   m_AccurateGbufferNormals: 0
   m_IntermediateTextureMode: 1
+--- !u!114 &5644432135983417205
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ccc275a0cf7c2f5488123b49c160d674, type: 3}
+  m_Name: PipeRenderFeature
+  m_EditorClassIdentifier: 
+  m_Active: 1
+  pipeMaterial: {fileID: 2100000, guid: c568f1805b499544f8f0b5e82b77f005, type: 2}
 --- !u!114 &8977464859203086925
 MonoBehaviour:
   m_ObjectHideFlags: 0
