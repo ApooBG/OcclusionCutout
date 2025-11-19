@@ -12,7 +12,7 @@ Shader "Debug/Stencil"
 
             Stencil
             {
-                Ref 1
+                Ref 3
                 Comp Equal
                 Pass Keep
             }
