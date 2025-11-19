@@ -2,7 +2,7 @@
 - Project name: OcclusionCutout
 - Unity version: Unity 6000.0.39f1
 - Active game object:
-  - Name: CurrentCylinder
+  - Name: Pipe
   - Tag: Untagged
-  - Layer: Default
+  - Layer: Pipe
 <!-- UNITY CODE ASSIST INSTRUCTIONS END -->
