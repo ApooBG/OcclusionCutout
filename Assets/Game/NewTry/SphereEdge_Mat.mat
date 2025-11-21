@@ -89,6 +89,7 @@ Material:
     - _AddPrecomputedVelocity: 0
     - _AlphaClip: 0
     - _AlphaToMask: 0
+    - _BaseRadius: 1.74
     - _Blend: 0
     - _BlendModePreserveSpecular: 1
     - _BumpScale: 1
@@ -100,7 +101,7 @@ Material:
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
     - _DstBlendAlpha: 0
-    - _EdgeThickness: 1
+    - _EdgeThickness: 0.97
     - _EnvironmentReflections: 1
     - _GapCellSize: 0.5
     - _GapKeepMax: 1
@@ -112,12 +113,13 @@ Material:
     - _Metallic: 0
     - _NoiseAmplitude: 5.24
     - _NoiseCutoff: 0.246
-    - _NoiseCutoffMax: 0.366
-    - _NoiseCutoffMin: 0.056
-    - _NoiseScale: 1
+    - _NoiseCutoffMax: 0.129
+    - _NoiseCutoffMin: 0.262
+    - _NoiseScale: 1.36
     - _OcclusionStrength: 1
     - _Parallax: 0.005
     - _QueueOffset: 0
+    - _RadiusJitter: 0.05
     - _ReceiveShadows: 1
     - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0
