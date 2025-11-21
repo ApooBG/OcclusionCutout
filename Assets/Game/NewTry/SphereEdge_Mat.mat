@@ -57,7 +57,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _NoiseTex:
-        m_Texture: {fileID: 2800000, guid: adabe9ddbe5480a4191c8823f4785a22, type: 3}
+        m_Texture: {fileID: 2800000, guid: a4d4694b52e0ea642b7b259052d7655f, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _OcclusionMap:
@@ -100,15 +100,21 @@ Material:
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
     - _DstBlendAlpha: 0
-    - _EdgeThickness: 1.23
+    - _EdgeThickness: 1
     - _EnvironmentReflections: 1
+    - _GapCellSize: 0.5
+    - _GapKeepMax: 1
+    - _GapKeepMin: 0
+    - _GapScale: 0.15
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
     - _Metallic: 0
     - _NoiseAmplitude: 5.24
-    - _NoiseCutoff: 0.369
-    - _NoiseScale: 9.16
+    - _NoiseCutoff: 0.246
+    - _NoiseCutoffMax: 0.366
+    - _NoiseCutoffMin: 0.056
+    - _NoiseScale: 1
     - _OcclusionStrength: 1
     - _Parallax: 0.005
     - _QueueOffset: 0

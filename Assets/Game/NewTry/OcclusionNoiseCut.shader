@@ -2,10 +2,11 @@ Shader "Custom/OcclusionNoiseCut"
 {
     Properties
     {
-        _MainTex    ("Base Texture", 2D) = "white" {}
-        _NoiseScale ("Noise Scale", Float) = 10.0
-        _Cutoff     ("Transparent Cutoff", Range(0,1)) = 0.4
-        _Darken     ("Darken Factor", Range(0,1)) = 0.6
+        _MainTex        ("Base Texture", 2D) = "white" {}
+        _NoiseTex       ("Noise Texture", 2D) = "gray" {}
+        _WorldScale     ("World Noise Scale", Float) = 0.2
+        _Cutoff         ("Transparent Cutoff", Range(0,1)) = 0.5
+        _Feather        ("Edge Feather", Range(0.1,10)) = 4.0
     }
 
     SubShader
@@ -23,7 +24,6 @@ Shader "Custom/OcclusionNoiseCut"
             Cull Back
             ZWrite On
             ZTest LEqual
-            // Stencil is controlled by the RenderObjects feature, so no Stencil{} here.
 
             HLSLPROGRAM
             #pragma vertex vert
@@ -41,49 +41,52 @@ Shader "Custom/OcclusionNoiseCut"
             {
                 float4 positionCS : SV_POSITION;
                 float2 uv         : TEXCOORD0;
+                float3 positionWS : TEXCOORD1;
             };
 
             TEXTURE2D(_MainTex);
             SAMPLER(sampler_MainTex);
             float4 _MainTex_ST;
 
-            float _NoiseScale;
-            float _Cutoff;
-            float _Darken;
+            TEXTURE2D(_NoiseTex);
+            SAMPLER(sampler_NoiseTex);
 
-            // Simple hash-based 2D noise in [0,1]
-            float hash21(float2 p)
-            {
-                p = frac(p * float2(123.34, 345.45));
-                p += dot(p, p + 34.345);
-                return frac(p.x * p.y);
-            }
+            float _WorldScale;
+            float _Cutoff;
+            float _Feather;
 
             Varyings vert (Attributes IN)
             {
                 Varyings OUT;
                 OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
-                OUT.uv = TRANSFORM_TEX(IN.uv, _MainTex);
+                OUT.uv         = TRANSFORM_TEX(IN.uv, _MainTex);
+                OUT.positionWS = TransformObjectToWorld(IN.positionOS.xyz);
                 return OUT;
             }
 
             float4 frag (Varyings IN) : SV_Target
             {
-                // Base wall color
+                // sample wall texture
                 float4 col = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv);
 
-                // UV-based noise
-                float n = hash21(IN.uv * _NoiseScale);
+                // multi-scale noise in world space for nice varied chunks
+                float2 baseUV = IN.positionWS.xz * _WorldScale;
 
-                // Some pixels -> fully transparent (hole)
-                if (n < _Cutoff)
-                    clip(-1); // discard fragment
+                float n0 = SAMPLE_TEXTURE2D(_NoiseTex, sampler_NoiseTex, baseUV).r;
+                float n1 = SAMPLE_TEXTURE2D(_NoiseTex, sampler_NoiseTex, baseUV * 2.7).r;
+                float n2 = SAMPLE_TEXTURE2D(_NoiseTex, sampler_NoiseTex, baseUV * 5.3).r;
 
-                // Others -> show wall but darkened based on noise
-                float dark = lerp(1.0, _Darken, n); // 1.._Darken
-                col.rgb *= dark;
+                float noise = (n0 + 0.6 * n1 + 0.3 * n2) / (1.0 + 0.6 + 0.3);
 
-                // Still opaque where we didn't clip
+                // sharpen noise around cutoff so shapes are crisp
+                float mask = saturate((noise - _Cutoff) * _Feather + 0.5);
+
+                // transparent vs wall: ONLY alpha, no black
+                if (mask <= 0.001)
+                    clip(-1);   // fully transparent, see through
+
+                // just return the wall color (maybe tiny variation if you want)
+                // col.rgb *= lerp(0.95, 1.05, noise); // optional subtle variation
                 return col;
             }
 

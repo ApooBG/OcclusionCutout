@@ -5,7 +5,14 @@
         _EdgeThickness   ("Base Edge Thickness", Float) = 0.01
         _NoiseTex        ("Edge Noise", 2D) = "white" {}
         _NoiseScale      ("Noise Scale (world)", Float) = 0.3
-        _NoiseCutoff     ("Noise Cutoff", Range(0,1)) = 0.5
+
+        _NoiseCutoffMin  ("Noise Cutoff Min", Range(0,1)) = 0.3
+        _NoiseCutoffMax  ("Noise Cutoff Max", Range(0,1)) = 0.7
+
+        // NEW: cell size in world units, not "scale"
+        _GapCellSize     ("Gap Cell Size (world)", Float) = 0.5
+        _GapKeepMin      ("Gap Keep Min", Range(0,1)) = 0.3
+        _GapKeepMax      ("Gap Keep Max", Range(0,1)) = 0.9
     }
 
     SubShader
@@ -56,7 +63,20 @@
 
             float _EdgeThickness;
             float _NoiseScale;
-            float _NoiseCutoff;
+            float _NoiseCutoffMin;
+            float _NoiseCutoffMax;
+
+            float _GapCellSize;
+            float _GapKeepMin;
+            float _GapKeepMax;
+
+            // hash -> [0,1]
+            float hash21(float2 p)
+            {
+                p = frac(p * float2(123.34, 345.45));
+                p += dot(p, p + 34.345);
+                return frac(p.x * p.y);
+            }
 
             Varyings vert(Attributes IN)
             {
@@ -70,7 +90,7 @@
             float4 frag(Varyings IN) : SV_Target
             {
                 // --- depth band (where sphere touches occluder) ---
-                float3 posVS = TransformWorldToView(IN.positionWS);
+                float3 posVS       = TransformWorldToView(IN.positionWS);
                 float  sphereDepth = -posVS.z;
 
                 float2 uv = IN.screenPos.xy / IN.screenPos.w;
@@ -83,24 +103,45 @@
                 if (occluderDepth <= 0.0001)
                     discard;
 
-                float diff = abs(sphereDepth - occluderDepth);
-                if (diff > _EdgeThickness)
-                    discard;          // outside contact band
+                float delta = sphereDepth - occluderDepth;  // negative = sphere in front
 
-                // --- noisy mask inside that band ---
-                // world-space so the pattern follows geometry
+                // keep only pixels where delta is between -2*thickness and +thickness
+                if (delta > _EdgeThickness || delta < -_EdgeThickness * 2.0)
+                    discard;
+
+                // --- coarse cell mask: big random gaps between chunks ---
+                if (_GapCellSize > 0.0001)
+                {
+                    // cell size is in *world units*
+                    float2 cellCoord = floor(IN.positionWS.xz / _GapCellSize);
+
+                    // random per cell
+                    float  cellRand  = hash21(cellCoord * 3.17);
+
+                    // this cell's "keep chance" between min/max
+                    float  keepChance = lerp(_GapKeepMin, _GapKeepMax, cellRand);
+
+                    // if random > keepChance -> drop this whole cell
+                    if (cellRand > keepChance)
+                        discard;
+                }
+                // if GapCellSize <= 0, we skip gap logic (no extra discard)
+
+                // --- noisy mask inside remaining cells ---
                 float2 noiseUV = IN.positionWS.xz * _NoiseScale;
                 float  noise   = SAMPLE_TEXTURE2D(_NoiseTex, sampler_NoiseTex, noiseUV).r;
 
-                // tweak shape a bit (optional)
-                // noise = pow(noise, 1.5); // uncomment to bias
+                // per-pixel random cutoff between min/max
+                float randVal     = hash21(IN.positionWS.xz * 0.57);
+                float localCutoff = lerp(_NoiseCutoffMin, _NoiseCutoffMax, randVal);
 
-                if (noise < _NoiseCutoff)
+                if (noise < localCutoff)
                     discard;          // create holes / broken chunks
 
                 // surviving pixels write stencil = 5
                 return 0;
             }
+
             ENDHLSL
         }
     }
