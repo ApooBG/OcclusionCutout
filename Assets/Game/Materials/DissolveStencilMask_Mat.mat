@@ -113,13 +113,13 @@ Material:
     - _ClearCoatSmoothness: 0
     - _Cull: 2
     - _Cutoff: 0.5
-    - _DarkenAlpha: 0.438
+    - _DarkenAlpha: 0.698
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
-    - _DissolveThreshold: 0.288
+    - _DissolveThreshold: 0.332
     - _DstBlend: 0
     - _DstBlendAlpha: 0
-    - _EdgeWidth: 0.2
+    - _EdgeWidth: 0.0821
     - _EnvironmentReflections: 1
     - _GlossMapScale: 0
     - _Glossiness: 0
