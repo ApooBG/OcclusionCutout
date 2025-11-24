@@ -4,42 +4,53 @@ using UnityEngine;
 public class HideIfNotOccController : MonoBehaviour
 {
     [SerializeField] List<HideIfNotOccludable> pipes;
-    bool renderedBeforeCamera = false;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
+    [SerializeField] LayerMask occludableMask;
 
-    // Update is called once per frame
+    // same box size for all pipes
+    [SerializeField] Vector3 overlapHalfSize = new Vector3(0.5f, 0.5f, 0.5f);
+
     void LateUpdate()
     {
-        CheckCollision();
+        UpdateVisibility();
     }
 
-    void CheckCollision()
+    void UpdateVisibility()
     {
-        int i = -1;
+        int lastCollidingIndex = -1;
+
+        for (int i = 0; i < pipes.Count; i++)
+        {
+            HideIfNotOccludable pipe = pipes[i];
+
+            // perform overlap box test at pipe position
+            bool colliding = Physics.CheckBox(
+                pipe.transform.position,
+                overlapHalfSize,
+                pipe.transform.rotation,
+                occludableMask
+            );
+
+            if (colliding)
+                lastCollidingIndex = i;
+        }
+
+        // apply visibility rules
+        for (int i = 0; i < pipes.Count; i++)
+        {
+            if (i <= lastCollidingIndex)
+                pipes[i].Show();
+            else
+                pipes[i].Hide();
+        }
+    }
+
+    void OnDrawGizmosSelected()
+    {
+        // visualize boxes for debugging
+        Gizmos.color = Color.yellow;
         foreach (var pipe in pipes)
         {
-            i++;
-            if (pipe.isColliding)
-            {
-                pipe.Show();
-                ShowPrevious(i);
-            }
-            else
-            {
-                pipe.Hide();
-            }
-        }   
-    }
-
-    void ShowPrevious(int numberInList)
-    {
-        for (int i = numberInList; i > 0; i--)
-        {
-            pipes[i].Show();
+            Gizmos.DrawWireCube(pipe.transform.position, overlapHalfSize * 2f);
         }
     }
 }
