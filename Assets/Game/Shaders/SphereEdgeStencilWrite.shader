@@ -1,4 +1,4 @@
-﻿Shader "Hidden/SphereEdgeStencilWrite_Enhanced"
+﻿Shader "Hidden/SphereEdgeStencilWrite"
 {
     Properties
     {
