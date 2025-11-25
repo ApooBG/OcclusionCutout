@@ -8,6 +8,7 @@ public class PipeClipController : MonoBehaviour
     public Transform player;
     public LayerMask occlusionMask;
     public float maxDistance = 100f;
+    public float endOffset = 1f; // Adjustable in inspector
 
     void Update()
     {
@@ -25,8 +26,9 @@ public class PipeClipController : MonoBehaviour
         if (camHit && playerHit)
         {
             float start = Vector3.Distance(camOrigin, camRayHit.point);
-            float end = Vector3.Distance(camOrigin, playerRayHit.point);
-            if (end < start) (start, end) = (end, start); // ensure start < end
+            float end = Vector3.Distance(camOrigin, playerRayHit.point) + endOffset;
+
+            if (end < start) (start, end) = (end, start);
 
             pipeMat.SetFloat("_StartDistance", start);
             pipeMat.SetFloat("_EndDistance", end);
