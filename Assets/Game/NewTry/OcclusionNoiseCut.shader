@@ -1,22 +1,16 @@
-Shader "Custom/OcclusionNoiseCut"
+Shader "Custom/OcclusionNoiseCut_SceneColor_Fixed"
 {
     Properties
     {
-        _MainTex        ("Base Texture", 2D) = "white" {}
-        _NoiseTex       ("Noise Texture", 2D) = "gray" {}
-        _WorldScale     ("World Noise Scale", Float) = 0.2
-        _Cutoff         ("Transparent Cutoff", Range(0,1)) = 0.5
-        _Feather        ("Edge Feather", Range(0.1,10)) = 4.0
+        _NoiseTex ("Noise Texture", 2D) = "gray" {}
+        _WorldScale ("World Noise Scale", Float) = 0.2
+        _Cutoff ("Transparent Cutoff", Range(0,1)) = 0.5
+        _Feather ("Edge Feather", Range(0.1,10)) = 4.0
     }
 
     SubShader
     {
-        Tags
-        {
-            "RenderPipeline" = "UniversalRenderPipeline"
-            "RenderType"     = "Opaque"
-            "Queue"          = "Geometry"
-        }
+        Tags { "RenderPipeline"="UniversalRenderPipeline" "RenderType"="Opaque" "Queue"="Geometry" }
 
         Pass
         {
@@ -34,22 +28,21 @@ Shader "Custom/OcclusionNoiseCut"
             struct Attributes
             {
                 float4 positionOS : POSITION;
-                float2 uv         : TEXCOORD0;
+                float2 uv : TEXCOORD0;
             };
 
             struct Varyings
             {
                 float4 positionCS : SV_POSITION;
-                float2 uv         : TEXCOORD0;
-                float3 positionWS : TEXCOORD1;
+                float3 positionWS : TEXCOORD0;
+                float4 screenPos : TEXCOORD1;
             };
-
-            TEXTURE2D(_MainTex);
-            SAMPLER(sampler_MainTex);
-            float4 _MainTex_ST;
 
             TEXTURE2D(_NoiseTex);
             SAMPLER(sampler_NoiseTex);
+
+            TEXTURE2D(_CameraOpaqueTexture);
+            SAMPLER(sampler_CameraOpaqueTexture);
 
             float _WorldScale;
             float _Cutoff;
@@ -59,17 +52,17 @@ Shader "Custom/OcclusionNoiseCut"
             {
                 Varyings OUT;
                 OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
-                OUT.uv         = TRANSFORM_TEX(IN.uv, _MainTex);
                 OUT.positionWS = TransformObjectToWorld(IN.positionOS.xyz);
+                OUT.screenPos = ComputeScreenPos(OUT.positionCS);
                 return OUT;
             }
 
             float4 frag (Varyings IN) : SV_Target
             {
-                // sample wall texture
-                float4 col = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv);
+                float2 screenUV = saturate(IN.screenPos.xy / IN.screenPos.w);
 
-                // multi-scale noise in world space for nice varied chunks
+                float4 col = SAMPLE_TEXTURE2D(_CameraOpaqueTexture, sampler_CameraOpaqueTexture, screenUV);
+
                 float2 baseUV = IN.positionWS.xz * _WorldScale;
 
                 float n0 = SAMPLE_TEXTURE2D(_NoiseTex, sampler_NoiseTex, baseUV).r;
@@ -78,15 +71,11 @@ Shader "Custom/OcclusionNoiseCut"
 
                 float noise = (n0 + 0.6 * n1 + 0.3 * n2) / (1.0 + 0.6 + 0.3);
 
-                // sharpen noise around cutoff so shapes are crisp
                 float mask = saturate((noise - _Cutoff) * _Feather + 0.5);
 
-                // transparent vs wall: ONLY alpha, no black
                 if (mask <= 0.001)
-                    clip(-1);   // fully transparent, see through
+                    clip(-1);
 
-                // just return the wall color (maybe tiny variation if you want)
-                // col.rgb *= lerp(0.95, 1.05, noise); // optional subtle variation
                 return col;
             }
 
