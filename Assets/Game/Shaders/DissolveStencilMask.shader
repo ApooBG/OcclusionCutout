@@ -23,7 +23,7 @@
 
             Stencil
             {
-                Ref 2
+                Ref 5
                 Comp Equal
                 Pass Keep
             }
