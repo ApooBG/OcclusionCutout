@@ -111,12 +111,13 @@ Material:
     - _Glossiness: 0
     - _GlossyReflections: 0
     - _Metallic: 0
+    - _Move: 0
     - _NoiseAmplitude: 5.24
     - _NoiseCutoff: 0.246
     - _NoiseCutoffMax: 0.155
     - _NoiseCutoffMin: 0.429
     - _NoiseOffset: 0
-    - _NoiseScale: 1.36
+    - _NoiseScale: 1.28
     - _OcclusionStrength: 1
     - _Parallax: 0.005
     - _QueueOffset: 0

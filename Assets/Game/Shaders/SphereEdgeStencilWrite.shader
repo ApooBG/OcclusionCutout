@@ -3,6 +3,7 @@
     Properties
     {
         _EdgeThickness   ("Base Edge Thickness", Float) = 0.01
+        _Move   ("Texture Movement", Range(0,9)) = 0.5
         _NoiseTex        ("Edge Noise", 2D) = "white" {}
         _NoiseScale      ("Noise Scale (world)", Float) = 0.3
         _NoiseCutoffMin  ("Noise Cutoff Min", Range(0,1)) = 0.3
@@ -64,6 +65,7 @@
             float _GapCellSize;
             float _GapKeepMin;
             float _GapKeepMax;
+            float _Move;
 
             float hash21(float2 p)
             {
@@ -110,7 +112,8 @@
                 }
 
                 float2 noiseUV = IN.positionWS.xz * _NoiseScale;
-                float timeShift = _Time.y * 0.1;
+
+                float timeShift = _Time.y * 0.1 * _Move;
                 noiseUV += float2(timeShift, -timeShift);
 
                 float n0 = SAMPLE_TEXTURE2D(_NoiseTex, sampler_NoiseTex, noiseUV).r;
