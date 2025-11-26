@@ -10,6 +10,7 @@
         _GapCellSize     ("Gap Cell Size (world)", Float) = 0.5
         _GapKeepMin      ("Gap Keep Min", Range(0,1)) = 0.3
         _GapKeepMax      ("Gap Keep Max", Range(0,1)) = 0.9
+        _Radius          ("Edge Radius", Float) = 1.0
     }
 
     SubShader
@@ -38,6 +39,7 @@
             HLSLPROGRAM
             #pragma vertex vert
             #pragma fragment frag
+            #pragma shader_feature _ANIMATE_VERTS_ON
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 
             struct Attributes
@@ -64,6 +66,8 @@
             float _GapCellSize;
             float _GapKeepMin;
             float _GapKeepMax;
+            float _Radius;
+            float _AnimateVerts;
 
             float hash21(float2 p)
             {
@@ -75,51 +79,53 @@
             Varyings vert(Attributes IN)
             {
                 Varyings OUT;
-                OUT.positionWS = TransformObjectToWorld(IN.positionOS.xyz);
-                OUT.positionCS = TransformWorldToHClip(OUT.positionWS);
+
+                float3 worldPos = TransformObjectToWorld(IN.positionOS.xyz);
+                float3 centerWS = _WorldSpaceCameraPos;
+
+            #if defined(_ANIMATE_VERTS_ON)
+                float2 noiseUV = worldPos.xz * _NoiseScale;
+                //noiseUV += float2(_Time.y * 0.1, -_Time.y * 0.1);
+
+                float mip = 0.0;
+                float n0 = tex2Dlod(sampler_NoiseTex, float4(noiseUV * 0.5, 0, mip)).r;
+                float n1 = tex2Dlod(sampler_NoiseTex, float4(noiseUV * 1.3 + 11.7, 0, mip)).r;
+                float noise = saturate(n0 * 0.6 + n1 * 0.4);
+                noise = pow(noise, 3.0);
+
+                float3 dir = normalize(worldPos - centerWS);
+                worldPos += dir * (noise - 0.5) * _EdgeThickness * 2.0;
+            #endif
+
+                OUT.positionWS = worldPos;
+                OUT.positionCS = TransformWorldToHClip(worldPos);
                 OUT.screenPos  = ComputeScreenPos(OUT.positionCS);
                 return OUT;
             }
 
+
             float4 frag(Varyings IN) : SV_Target
             {
                 float3 posVS = TransformWorldToView(IN.positionWS);
-                float  sphereDepth = -posVS.z;
+                float sphereDepth = -posVS.z;
 
                 float2 uv = IN.screenPos.xy / IN.screenPos.w;
-                float  occluderDepth = SAMPLE_TEXTURE2D_X(
-                    _OccludableDepthTex,
-                    sampler_OccludableDepthTex,
-                    uv
-                ).r;
-
-                if (occluderDepth <= 0.0001)
-                    discard;
+                float occluderDepth = SAMPLE_TEXTURE2D_X(_OccludableDepthTex, sampler_OccludableDepthTex, uv).r;
+                if (occluderDepth <= 0.0001) discard;
 
                 float delta = sphereDepth - occluderDepth;
-                if (delta > _EdgeThickness || delta < -_EdgeThickness * 2.0)
+                if (abs(delta) > _EdgeThickness)
                     discard;
 
-                if (_GapCellSize > 0.0001)
-                {
-                    float2 cellCoord = floor(IN.positionWS.xz / _GapCellSize);
-                    float  cellRand  = hash21(cellCoord * 3.17);
-                    float  keepChance = lerp(_GapKeepMin, _GapKeepMax, cellRand);
-                    if (cellRand > keepChance)
-                        discard;
-                }
-
                 float2 noiseUV = IN.positionWS.xz * _NoiseScale;
-                float timeShift = _Time.y * 0.1;
-                noiseUV += float2(timeShift, -timeShift);
+                //noiseUV += float2(_Time.y * 0.1, _Time.y * -0.1);
 
-                float n0 = SAMPLE_TEXTURE2D(_NoiseTex, sampler_NoiseTex, noiseUV).r;
-                float n1 = SAMPLE_TEXTURE2D(_NoiseTex, sampler_NoiseTex, noiseUV * 2.3).r;
-                float n2 = SAMPLE_TEXTURE2D(_NoiseTex, sampler_NoiseTex, noiseUV * 5.1).r;
-                float noise = (n0 + 0.6 * n1 + 0.3 * n2) / (1.0 + 0.6 + 0.3);
+                float noise = SAMPLE_TEXTURE2D(_NoiseTex, sampler_NoiseTex, noiseUV).r;
+                noise = pow(noise, 2.5);
 
-                float randVal = hash21(IN.positionWS.xz * 0.73);
+                float randVal = hash21(IN.positionWS.xz * 3.1);
                 float localCutoff = lerp(_NoiseCutoffMin, _NoiseCutoffMax, randVal);
+
                 if (noise < localCutoff)
                     discard;
 
