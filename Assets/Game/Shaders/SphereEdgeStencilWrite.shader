@@ -11,6 +11,7 @@
         _GapKeepMin      ("Gap Keep Min", Range(0,1)) = 0.3
         _GapKeepMax      ("Gap Keep Max", Range(0,1)) = 0.9
         _Radius          ("Edge Radius", Float) = 1.0
+        _AnimateVerts    ("Animate Vertices", Float) = 0     // 0 = off, 1 = on
     }
 
     SubShader
@@ -85,7 +86,8 @@
 
             #if defined(_ANIMATE_VERTS_ON)
                 float2 noiseUV = worldPos.xz * _NoiseScale;
-                //noiseUV += float2(_Time.y * 0.1, -_Time.y * 0.1);
+                if (_AnimateVerts == 1)
+                 noiseUV += float2(_Time.y * 0.1, -_Time.y * 0.1);
 
                 float mip = 0.0;
                 float n0 = tex2Dlod(sampler_NoiseTex, float4(noiseUV * 0.5, 0, mip)).r;
@@ -118,7 +120,8 @@
                     discard;
 
                 float2 noiseUV = IN.positionWS.xz * _NoiseScale;
-                //noiseUV += float2(_Time.y * 0.1, _Time.y * -0.1);
+                if (_AnimateVerts == 1)
+                noiseUV += float2(_Time.y * 0.1, _Time.y * -0.1);
 
                 float noise = SAMPLE_TEXTURE2D(_NoiseTex, sampler_NoiseTex, noiseUV).r;
                 noise = pow(noise, 2.5);
