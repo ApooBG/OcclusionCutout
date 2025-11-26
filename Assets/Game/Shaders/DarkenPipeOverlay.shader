@@ -10,7 +10,7 @@
             Cull Off
 
             Stencil {
-                Ref 5
+                Ref 2
                 Comp Equal
                 Pass Keep
             }
