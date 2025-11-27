@@ -101,7 +101,7 @@ Material:
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
     - _DstBlendAlpha: 0
-    - _EdgeThickness: 1.04
+    - _EdgeThickness: 2.37
     - _EnvironmentReflections: 1
     - _GapCellSize: 0.85
     - _GapKeepMax: 1
@@ -111,7 +111,7 @@ Material:
     - _Glossiness: 0
     - _GlossyReflections: 0
     - _Metallic: 0
-    - _Move: 0
+    - _Move: 0.65
     - _NoiseAmplitude: 5.24
     - _NoiseCutoff: 0.246
     - _NoiseCutoffMax: 0.155

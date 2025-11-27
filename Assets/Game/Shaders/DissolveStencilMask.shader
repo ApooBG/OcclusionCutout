@@ -18,7 +18,7 @@
         {
             ZWrite Off
             ZTest LEqual
-            Cull Off
+            Cull Front
             Blend SrcAlpha OneMinusSrcAlpha
 
             Stencil
