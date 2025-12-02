@@ -83,8 +83,9 @@
             */
             half4 frag(Varyings IN) : SV_Target
             {
-                float2 noiseUV = IN.worldPos.xz * 0.5;
-                float noise = tex2D(_NoiseTex, noiseUV).r;
+                float2 screenUV = IN.screenPos.xy / IN.screenPos.w;
+                //float2 noiseUV = IN.worldPos.xz * 0.5;
+                float noise = tex2D(_NoiseTex, screenUV).r;
 
                 float diff = _DissolveThreshold - noise;
                 float edge = smoothstep(0.0, _EdgeWidth, diff);
@@ -92,7 +93,6 @@
                 if (noise > _DissolveThreshold)
                     discard;
 
-                float2 screenUV = IN.screenPos.xy / IN.screenPos.w;
                 float3 bg = tex2D(_BackgroundTex, screenUV).rgb;
 
                 float3 finalColor = lerp(_EdgeColor.rgb, bg, edge);

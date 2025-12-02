@@ -7,7 +7,7 @@ public class BlobbySphereDeformer : MonoBehaviour
 {
     [Header("Noise Settings")]
     [Tooltip("How strongly vertices are pushed in/out from the center.")]
-    public float amplitude = 0.2f;          // how much to break the circle
+    public float amplitude = 0.2f;
 
     [Tooltip("Frequency of the noise pattern on the sphere surface.")]
     public float frequency = 3f;
@@ -16,17 +16,13 @@ public class BlobbySphereDeformer : MonoBehaviour
     public int seed = 1234;
 
     [Header("Options")]
-    [Tooltip("Apply deformation continuously (in editor + play mode). Turn off to keep it static.")]
     public bool updateEveryFrame = false;
-
-    [Tooltip("Rebuild the deformed mesh when parameters change.")]
     public bool autoRebuildOnChange = true;
 
     private MeshFilter meshFilter;
     private Mesh originalMesh;
     private Mesh deformedMesh;
 
-    // cache hash of last settings to detect changes
     private int lastSeed;
     private float lastAmplitude;
     private float lastFrequency;
@@ -40,12 +36,8 @@ public class BlobbySphereDeformer : MonoBehaviour
             return;
         }
 
-        // Keep a copy of the original mesh so we don't destroy the asset
         if (originalMesh == null)
-        {
-            // Use sharedMesh as source
             originalMesh = meshFilter.sharedMesh;
-        }
 
         if (deformedMesh == null)
         {
@@ -61,11 +53,8 @@ public class BlobbySphereDeformer : MonoBehaviour
 
     void OnDisable()
     {
-        // Optionally restore the original mesh when disabling
         if (meshFilter != null && originalMesh != null)
-        {
             meshFilter.sharedMesh = originalMesh;
-        }
     }
 
     void Update()
@@ -108,42 +97,46 @@ public class BlobbySphereDeformer : MonoBehaviour
             return;
 
         Vector3[] srcVerts = originalMesh.vertices;
-        Vector3[] srcNormals = originalMesh.normals;
-
-        if (srcNormals == null || srcNormals.Length != srcVerts.Length)
-        {
-            // If no normals, recalc on original temporarily
-#if UNITY_EDITOR
-            originalMesh.RecalculateNormals();
-            srcNormals = originalMesh.normals;
-#else
-            return;
-#endif
-        }
-
         Vector3[] dstVerts = new Vector3[srcVerts.Length];
 
-        // Use a pseudo-random offset so different seeds give different blobs
+        // assume sphere is centered at local (0,0,0)
         float seedOffset = seed * 0.1234f;
+        float twoPi = math.PI * 2f;
 
         for (int i = 0; i < srcVerts.Length; i++)
         {
             Vector3 v = srcVerts[i];
-            Vector3 n = srcNormals[i].normalized;
 
-            // Compute spherical-ish coordinates from normal for sampling
-            // (works well if the mesh is roughly a sphere centered at origin)
-            float3 dir = new float3(n.x, n.y, n.z); // conceptual; we only use xz
-            float2 uv = new Vector2(n.x, n.z) * frequency + new Vector2(seedOffset, seedOffset);
+            // Direction from center, and original radius
+            float radius = v.magnitude;
+            if (radius <= 1e-5f)
+            {
+                dstVerts[i] = v;
+                continue;
+            }
 
-            // Unity has 2D PerlinNoise
-            float noise = Mathf.PerlinNoise(uv.x, uv.y); // 0..1
-            float signed = (noise - 0.5f) * 2.0f;        // -1..1
+            Vector3 dir = v / radius;  // normalized
+
+            // Convert direction to "spherical" UV for stable noise:
+            // u = azimuth angle (around Y), v = height
+            float azimuth = Mathf.Atan2(dir.z, dir.x);       // -pi..pi
+            float u = azimuth / twoPi + 0.5f;                // 0..1
+            float vCoord = dir.y * 0.5f + 0.5f;              // -1..1 -> 0..1
+
+            Vector2 uv = new Vector2(u, vCoord) * frequency +
+                         new Vector2(seedOffset, seedOffset);
+
+            float noise = Mathf.PerlinNoise(uv.x, uv.y);     // 0..1
+            float signed = (noise - 0.5f) * 2.0f;            // -1..1
 
             float offset = signed * amplitude;
 
-            // Push vertex along its normal
-            dstVerts[i] = v + n * offset;
+            // New radius, only slightly in/out.
+            float newRadius = radius + offset;
+            // Avoid inverting the sphere on itself
+            newRadius = Mathf.Max(radius * 0.1f, newRadius);
+
+            dstVerts[i] = dir * newRadius;
         }
 
         deformedMesh.vertices = dstVerts;

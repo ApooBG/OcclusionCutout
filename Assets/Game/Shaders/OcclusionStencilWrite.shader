@@ -1,5 +1,6 @@
-﻿Shader "Hidden/OcclusionStencilWrite" {
-  SubShader
+﻿Shader "Hidden/OcclusionStencilWrite"
+{
+    SubShader
     {
         Tags { "Queue"="Geometry-20" "RenderType"="Opaque" }
         Pass
@@ -22,8 +23,15 @@
             #pragma fragment frag
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 
-            struct A { float4 pos : POSITION; };
-            struct V { float4 pos : SV_POSITION; };
+            struct A
+            {
+                float4 pos : POSITION;
+            };
+
+            struct V
+            {
+                float4 pos : SV_POSITION;
+            };
 
             V vert(A v)
             {
