@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Cutout_Mat
-  m_Shader: {fileID: 4800000, guid: 12d3af564da027041a160f0dc5bb8c05, type: 3}
+  m_Name: DarkenStencil_Mat
+  m_Shader: {fileID: 4800000, guid: b9836610df9e68a4f946235fe8594452, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -107,10 +107,9 @@ Material:
     - _GlossyReflections: 0
     - _InnerRadius: 9.2
     - _Metallic: 0
-    - _NoiseScale: 4.01
-    - _NoiseThreshold: 0.37
+    - _NoiseScale: 8.55
+    - _NoiseThreshold: 0.33
     - _OcclusionStrength: 1
-    - _OuterDebrisAmount: 1
     - _Parallax: 0.005
     - _QueueOffset: 0
     - _Radius: 11.39
