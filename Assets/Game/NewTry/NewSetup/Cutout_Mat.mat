@@ -104,6 +104,8 @@ Material:
     - _Back_PieceCount: 4.78
     - _Blend: 0
     - _BlendModePreserveSpecular: 1
+    - _BlobBias: 0.38
+    - _BlobSharpness: 3.74
     - _BumpScale: 1
     - _ClearCoatMask: 0
     - _ClearCoatSmoothness: 0
@@ -113,6 +115,9 @@ Material:
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
     - _DstBlendAlpha: 0
+    - _EdgeEnd: 1
+    - _EdgeMid: 0.62
+    - _EdgeStart: 0.65
     - _EdgeWidth: 8.4
     - _EnvironmentReflections: 1
     - _FrontPieceCount: 20
@@ -133,10 +138,12 @@ Material:
     - _GlossyReflections: 0
     - _InnerRadius: 9.2
     - _Metallic: 0
-    - _NoiseScale: 6.27
-    - _NoiseThreshold: 0.48
+    - _NoiseScale: 4.08
+    - _NoiseThreshold: 0.56
     - _OcclusionStrength: 1
     - _OuterDebrisAmount: 1
+    - _OuterNoiseScale: 1.88
+    - _OuterRadiusFactor: 2.16
     - _Parallax: 0.005
     - _QueueOffset: 0
     - _Radius: 11.39
@@ -147,6 +154,7 @@ Material:
     - _SrcBlend: 1
     - _SrcBlendAlpha: 1
     - _Surface: 0
+    - _ViewConeCos: 0.895
     - _WorkflowMode: 1
     - _ZWrite: 1
     m_Colors:
