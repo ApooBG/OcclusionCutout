@@ -1,5 +1,18 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-1672719229124296230
+MonoBehaviour:
+  m_ObjectHideFlags: 11
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0353a89b1f911e48b9e16bdc9f2e058, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  version: 9
 --- !u!21 &2100000
 Material:
   serializedVersion: 8
@@ -7,8 +20,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Cutout_Mat
-  m_Shader: {fileID: 4800000, guid: 12d3af564da027041a160f0dc5bb8c05, type: 3}
+  m_Name: SphereCollisionStencil_Mat
+  m_Shader: {fileID: 4800000, guid: e9ab4d88f17f08d458547fdc8fcc03df, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -56,10 +69,6 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
-    - _NoiseTex:
-        m_Texture: {fileID: 2800000, guid: a4d4694b52e0ea642b7b259052d7655f, type: 3}
-        m_Scale: {x: 2, y: 1}
-        m_Offset: {x: 0, y: 0}
     - _OcclusionMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -89,19 +98,6 @@ Material:
     - _AddPrecomputedVelocity: 0
     - _AlphaClip: 0
     - _AlphaToMask: 0
-    - _BackPieceCount: 12
-    - _BackPieceDensity: 0.4
-    - _BackPieceMaxSize: 0.35
-    - _BackPieceMinSize: 0.1
-    - _BackPieceSharpness: 2
-    - _BackPieceSpacing: 0.5
-    - _Back_MaxFlowDist: 8.43
-    - _Back_MaxPieceSize: 5.2
-    - _Back_MinFlowDist: 2.83
-    - _Back_MinPieceSize: 3.23
-    - _Back_NoiseScale: 3.99
-    - _Back_NoiseThreshold: 2.53
-    - _Back_PieceCount: 4.78
     - _Blend: 0
     - _BlendModePreserveSpecular: 1
     - _BumpScale: 1
@@ -113,33 +109,14 @@ Material:
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
     - _DstBlendAlpha: 0
-    - _EdgeWidth: 8.4
     - _EnvironmentReflections: 1
-    - _FrontPieceCount: 20
-    - _FrontPieceDensity: 0.5
-    - _FrontPieceMaxSize: 0.25
-    - _FrontPieceMinSize: 0.05
-    - _FrontPieceSharpness: 2.5
-    - _FrontPieceSpacing: 0.4
-    - _Front_MaxFlowDist: 8.38
-    - _Front_MaxPieceSize: 6.51
-    - _Front_MinFlowDist: 5.84
-    - _Front_MinPieceSize: 5.56
-    - _Front_NoiseScale: 12.6
-    - _Front_NoiseThreshold: 0.6
-    - _Front_PieceCount: 5.31
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
-    - _InnerRadius: 9.2
     - _Metallic: 0
-    - _NoiseScale: 6.27
-    - _NoiseThreshold: 0.48
     - _OcclusionStrength: 1
-    - _OuterDebrisAmount: 1
     - _Parallax: 0.005
     - _QueueOffset: 0
-    - _Radius: 11.39
     - _ReceiveShadows: 1
     - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0
@@ -151,24 +128,8 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
-    - _BubbleCenter: {r: 0, g: 0, b: 0, a: 0}
-    - _BubbleColor: {r: 0, g: 0.8, b: 1, a: 0.15}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _EdgeColor: {r: 1, g: 1, b: 1, a: 0.7}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
---- !u!114 &5120406165988832225
-MonoBehaviour:
-  m_ObjectHideFlags: 11
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d0353a89b1f911e48b9e16bdc9f2e058, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  version: 9
