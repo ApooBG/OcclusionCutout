@@ -107,8 +107,8 @@ Material:
     - _GlossyReflections: 0
     - _InnerRadius: 9.2
     - _Metallic: 0
-    - _NoiseScale: 7.01
-    - _NoiseThreshold: 26.21
+    - _NoiseScale: 4.08
+    - _NoiseThreshold: 0.56
     - _OcclusionStrength: 1
     - _Parallax: 0.005
     - _QueueOffset: 0

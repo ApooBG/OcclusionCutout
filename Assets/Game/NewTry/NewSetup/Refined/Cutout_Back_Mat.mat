@@ -101,8 +101,8 @@ Material:
     - _Glossiness: 0
     - _GlossyReflections: 0
     - _Metallic: 0
-    - _NoiseScale: 20.44
-    - _NoiseThreshold: 1.8
+    - _NoiseScale: 4.08
+    - _NoiseThreshold: 0.56
     - _OcclusionStrength: 1
     - _Parallax: 0.005
     - _QueueOffset: 0

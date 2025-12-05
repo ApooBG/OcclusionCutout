@@ -1324,11 +1324,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 87785b934756d014ebd6c70cefc8faaa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  overrideMaterial: {fileID: 2100000, guid: 0f6df6d0ef33ef549b5a31a4716509fa, type: 2}
-  depthMaterial: {fileID: 2100000, guid: bd9b5eae722a5ca429ed55728cbc30cb, type: 2}
+  cutoutFront: {fileID: 2100000, guid: 941f552dca6bc6b479463d946a2efe12, type: 2}
+  cutoutBack: {fileID: 2100000, guid: 4f14a351b608a0d46b4469b4b1e6005c, type: 2}
+  cutoutEdge: {fileID: 2100000, guid: 71d8ee1a0187b464d9f599771f8a8047, type: 2}
   player: {fileID: 1659945115}
   cameraTransform: {fileID: 1261710203}
-  sphereSideSign: -1
 --- !u!23 &1862281654
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -1391,8 +1391,8 @@ Transform:
   m_GameObject: {fileID: 1862281652}
   serializedVersion: 2
   m_LocalRotation: {x: 0.17115258, y: -0.5686503, z: -0.7971499, w: 0.10906743}
-  m_LocalPosition: {x: -0.5926199, y: 0.13920069, z: -0.22399902}
-  m_LocalScale: {x: 6.099779, y: 6.0997777, z: 6.0997796}
+  m_LocalPosition: {x: -0.59, y: 0.17, z: -0.31}
+  m_LocalScale: {x: 6.926299, y: 6.926297, z: 6.9262996}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 135843333}
