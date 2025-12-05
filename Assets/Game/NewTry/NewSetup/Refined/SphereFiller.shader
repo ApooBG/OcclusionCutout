@@ -1,14 +1,14 @@
-﻿Shader "Hidden/DarkenStencil"
+﻿Shader "Hidden/SphereFiller"
 {
     SubShader
     {
-        Tags { "RenderType"="Transparent" "Queue"="Overlay" }
+        Tags { "Queue"="Geometry" }
 
         Pass
         {
-            ZTest Always
+            Cull Off
             ZWrite Off
-            Blend SrcAlpha OneMinusSrcAlpha
+            ZTest LEqual
             ColorMask RGB
 
             Stencil
@@ -23,26 +23,24 @@
             #pragma fragment frag
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 
-            struct Attributes
-            {
-                float4 positionOS : POSITION;
-            };
+            struct Attributes { float4 positionOS : POSITION; };
+            struct Varyings { float4 posHCS : SV_POSITION; };
 
-            struct Varyings
-            {
-                float4 positionHCS : SV_POSITION;
-            };
+            float3 _SpherePosition;
+            float _SphereRadius;
 
             Varyings vert(Attributes IN)
             {
                 Varyings OUT;
-                OUT.positionHCS = TransformObjectToHClip(IN.positionOS);
+                OUT.posHCS = TransformObjectToHClip(IN.positionOS);
                 return OUT;
             }
 
-            half4 frag(Varyings i) : SV_Target
+            half4 frag(Varyings IN) : SV_Target
             {
-                return half4(0, 0, 0, 0.3); // Slight black tint, 30% opacity
+                // You can color this however you want.
+                // A darkened version of the wall color works best.
+                return half4(0.1, 0.1, 0.1, 1.0);
             }
             ENDHLSL
         }

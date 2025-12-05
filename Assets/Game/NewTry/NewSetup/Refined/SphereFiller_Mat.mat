@@ -20,7 +20,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: SphereCollisionStencil_Mat
+  m_Name: SphereFiller_Mat
   m_Shader: {fileID: 4800000, guid: e9ab4d88f17f08d458547fdc8fcc03df, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
