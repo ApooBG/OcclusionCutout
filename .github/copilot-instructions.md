@@ -2,7 +2,7 @@
 - Project name: OcclusionCutout
 - Unity version: Unity 6000.0.39f1
 - Active game object:
-  - Name: Occlusion Cutout
+  - Name: SphereCutout (2)
   - Tag: Untagged
-  - Layer: IgnoreOccludable
+  - Layer: OcclusionVolume
 <!-- UNITY CODE ASSIST INSTRUCTIONS END -->

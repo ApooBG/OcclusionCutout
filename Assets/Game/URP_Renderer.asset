@@ -76,9 +76,9 @@ MonoBehaviour:
   m_Active: 1
   settings:
     passTag: FillerPass
-    Event: 450
+    Event: 250
     filterSettings:
-      RenderQueueType: 1
+      RenderQueueType: 0
       LayerMask:
         serializedVersion: 2
         m_Bits: 128
@@ -88,13 +88,13 @@ MonoBehaviour:
     overrideShader: {fileID: 0}
     overrideShaderPassIndex: 0
     overrideMode: 1
-    overrideDepthState: 1
-    depthCompareFunction: 4
+    overrideDepthState: 0
+    depthCompareFunction: 6
     enableWrite: 0
     stencilSettings:
       overrideStencilState: 1
-      stencilReference: 1
-      stencilCompareFunction: 3
+      stencilReference: 2
+      stencilCompareFunction: 6
       passOperation: 0
       failOperation: 0
       zFailOperation: 0

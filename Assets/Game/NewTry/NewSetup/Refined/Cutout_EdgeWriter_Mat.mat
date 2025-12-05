@@ -88,6 +88,8 @@ Material:
     - _Blend: 0
     - _BlendModePreserveSpecular: 1
     - _BumpScale: 1
+    - _CellDensity: 6.49
+    - _CellJitter: 0.7
     - _ClearCoatMask: 0
     - _ClearCoatSmoothness: 0
     - _Cull: 2
@@ -96,13 +98,16 @@ Material:
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
     - _DstBlendAlpha: 0
+    - _EdgeThickness: 0.32
     - _EnvironmentReflections: 1
+    - _FragmentFeather: 0.34
+    - _FragmentRadius: 0.25
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
     - _Metallic: 0
     - _NoiseScale: 4.08
-    - _NoiseThreshold: 0.56
+    - _NoiseThreshold: 0.92
     - _OcclusionStrength: 1
     - _Parallax: 0.005
     - _QueueOffset: 0

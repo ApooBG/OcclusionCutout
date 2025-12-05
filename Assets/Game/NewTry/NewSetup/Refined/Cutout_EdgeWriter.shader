@@ -1,106 +1,166 @@
-Shader "Hidden/Cutout_EdgeWriter"
+﻿Shader "Hidden/Cutout_Edge"
 {
     Properties
     {
-        _NoiseScale ("Noise Scale", Float) = 1.0
-        _NoiseThreshold ("Noise Threshold", Float) = 0.5
-        _ViewConeCos("View Cone Cosine", Range(0,1)) = 0.8
+        // How “full” the edge is with fragments (0 = almost empty, 1 = solid)
+        _NoiseThreshold   ("Fragment Fill Threshold", Range(0,1)) = 0.35
+
+        // World-space thickness of the spherical edge band where fragments appear
+        _EdgeThickness    ("Edge Band Thickness", Float) = 0.4
+
+        // Controls how many pieces there are (higher = more, smaller pieces)
+        _CellDensity      ("Piece Density", Float) = 4.0
+
+        // Radius of each Voronoi piece (in noise space, not world units)
+        _FragmentRadius   ("Piece Radius", Range(0.01,1)) = 0.25
+
+        // Softness of the piece edge (0 = razor sharp)
+        _FragmentFeather  ("Piece Feather", Range(0,0.5)) = 0.05
+
+        // 0 = grid-ish, 1 = fully random positions of pieces
+        _CellJitter       ("Piece Randomness", Range(0,1)) = 1.0
     }
 
     SubShader
     {
         Tags { "RenderType"="Opaque" }
 
+        // BACK faces of the sphere write stencil = 2 with noisy fragments
         Pass
         {
-            Cull Off
+            Cull Front
             ZWrite Off
             ColorMask 0
 
             Stencil
             {
-                Ref 3
+                Ref 2
                 Comp Always
                 Pass Replace
             }
 
             HLSLPROGRAM
-            #pragma vertex vert
+            #pragma vertex   vert
             #pragma fragment frag
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 
-            struct Attributes { float4 positionOS : POSITION; };
-            struct Varyings   { float4 positionHCS : SV_POSITION; float3 worldPos : TEXCOORD0; };
+            // -------- Shared Structs --------
+            struct Attributes
+            {
+                float4 positionOS : POSITION;
+            };
 
+            struct Varyings
+            {
+                float4 positionHCS : SV_POSITION;
+                float3 worldPos    : TEXCOORD0;
+            };
+
+            // -------- Uniforms from C# --------
             float3 _SpherePosition;
             float  _SphereRadius;
-            float  _NoiseScale;
+
             float  _NoiseThreshold;
+            float  _EdgeThickness;
+            float  _CellDensity;
+            float  _FragmentRadius;
+            float  _FragmentFeather;
+            float  _CellJitter;
+
             float3 _CameraWorldPos;
             float3 _PlayerWorldPos;
-            float  _ViewConeCos;
 
-            float hash(float2 p)
+            // -------- Hash helpers (3D) --------
+            float3 hash31(float3 p)
             {
-                p = frac(p * 0.3183099 + float2(0.1,0.7));
-                p *= 17.0;
-                return frac(p.x*p.y*(p.x+p.y));
+                // simple, cheap 3D hash → [0,1]^3
+                p = frac(p * 0.1031);
+                p += dot(p, p.yzx + 33.33);
+                return frac((p.xxy + p.yzz) * p.zyx);
             }
 
-            float noise(float2 p)
+            // -------- 3D Voronoi: distance to nearest random feature point --------
+            float voronoi3(float3 p, float jitter)
             {
-                float2 i = floor(p);
-                float2 f = frac(p);
-                float2 u = f*f*(3.0 - 2.0*f);
-                float n00 = hash(i);
-                float n10 = hash(i + float2(1,0));
-                float n01 = hash(i + float2(0,1));
-                float n11 = hash(i + float2(1,1));
-                return lerp(lerp(n00,n10,u.x), lerp(n01,n11,u.x), u.y);
+                float3 i = floor(p);
+                float3 f = frac(p);
+
+                float minDist = 10.0;
+
+                [unroll]
+                for (int z = -1; z <= 1; z++)
+                {
+                    [unroll]
+                    for (int y = -1; y <= 1; y++)
+                    {
+                        [unroll]
+                        for (int x = -1; x <= 1; x++)
+                        {
+                            float3 cell = float3(x, y, z);
+                            float3 rnd  = hash31(i + cell);
+
+                            // move feature point inside the cell
+                            rnd = (rnd * 2.0 - 1.0) * jitter;
+
+                            float3 diff = cell + rnd - f;
+                            float d = dot(diff, diff);  // squared distance is fine
+
+                            minDist = min(minDist, d);
+                        }
+                    }
+                }
+
+                return sqrt(minDist); // actual distance
             }
 
+            // -------- Vertex --------
             Varyings vert(Attributes IN)
             {
                 Varyings OUT;
                 OUT.positionHCS = TransformObjectToHClip(IN.positionOS);
-                OUT.worldPos = TransformObjectToWorld(IN.positionOS.xyz);
+                OUT.worldPos    = TransformObjectToWorld(IN.positionOS.xyz);
                 return OUT;
             }
 
+            // -------- Fragment --------
             half4 frag(Varyings IN) : SV_Target
             {
+                // radial distance from sphere center
                 float dist = distance(IN.worldPos, _SpherePosition);
-                float2 uv = IN.worldPos.xz * _NoiseScale;
 
-                float edgeFade = saturate((_SphereRadius - dist) / _SphereRadius);
-                float n = (noise(uv) + noise(uv*2.3) + noise(uv*4.1)) / 3.0;
-                float blend = edgeFade + n * 0.5;
-                float mask = smoothstep(_NoiseThreshold, _NoiseThreshold + 0.15, blend);
+                // Edge band around the sphere surface where we allow fragments
+                // edge = 1 at sphere surface, 0 outside the band
+                float edge = 1.0 - saturate(abs(dist - _SphereRadius) / max(_EdgeThickness, 1e-4));
 
-                float outerFade = saturate(((_SphereRadius * 1.4) - dist) / (_SphereRadius * 1.4));
-                float islands = smoothstep(0.6, 0.95, noise(uv*6.0 + 23.0)) * outerFade;
+                // 3D Voronoi noise for shatter pieces (no projection stretching)
+                float3 p = IN.worldPos * _CellDensity;
+                float d = voronoi3(p, _CellJitter);
 
-                float combined = max(mask, islands);
+                // Small islands around each Voronoi seed → individual debris pieces
+                float islands = 1.0 - smoothstep(_FragmentRadius,
+                                                 _FragmentRadius + _FragmentFeather,
+                                                 d);
 
-                float edge =
-                    smoothstep(0.45, 0.55, combined) *
-                    (1.0 - smoothstep(0.55, 0.65, combined));
+                // Combine edge band & islands
+                float debrisMask = edge * islands;
 
-                if (edge < 0.01)
+                // Control fill amount with slider
+                float mask = step(_NoiseThreshold, debrisMask);
+
+                if (mask < 0.5)
                     discard;
 
-                float3 viewDir = _PlayerWorldPos - _CameraWorldPos;
-                float3 toPixel = IN.worldPos - _CameraWorldPos;
+                // Optional: only cut along camera → player segment (like your original)
+                float3 viewDir  = _PlayerWorldPos - _CameraWorldPos;
+                float3 toPixel  = IN.worldPos      - _CameraWorldPos;
 
-                float proj = dot(toPixel, normalize(viewDir));
-                float viewLength = length(viewDir);
-                if (proj < 0 || proj > viewLength)
+                float viewLen   = length(viewDir);
+                float proj      = dot(toPixel, normalize(viewDir));
+
+                if (proj < 0.0 || proj > viewLen)
                     discard;
 
-                float cosAngle = dot(normalize(toPixel), normalize(viewDir));
-                if (cosAngle < _ViewConeCos)
-                    discard;
-
+                // We only care about stencil, not color
                 return 0;
             }
             ENDHLSL
