@@ -2,7 +2,7 @@
 - Project name: OcclusionCutout
 - Unity version: Unity 6000.0.39f1
 - Active game object:
-  - Name: SphereCutout (2)
+  - Name: Temple Wall 2B2 (4)
   - Tag: Untagged
-  - Layer: OcclusionVolume
+  - Layer: Default
 <!-- UNITY CODE ASSIST INSTRUCTIONS END -->

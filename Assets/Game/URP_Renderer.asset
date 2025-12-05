@@ -61,7 +61,7 @@ MonoBehaviour:
     volumeDepthMaterial: {fileID: 2100000, guid: 13d3a96f85b6fd040b4f8d25dbabe6a6, type: 2}
     compositeMaterial: {fileID: 2100000, guid: ab8eba80f6e53824eba3e91546329761, type: 2}
     debugShowOcclusionRT: 1
---- !u!114 &-633548159829259212
+--- !u!114 &-1379291690559554488
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -71,30 +71,30 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6b3d386ba5cd94485973aee1479b272e, type: 3}
-  m_Name: FillerPass
+  m_Name: RenderObjects
   m_EditorClassIdentifier: 
-  m_Active: 1
+  m_Active: 0
   settings:
-    passTag: FillerPass
-    Event: 250
+    passTag: RenderObjects
+    Event: 300
     filterSettings:
       RenderQueueType: 0
       LayerMask:
         serializedVersion: 2
         m_Bits: 128
       PassNames: []
-    overrideMaterial: {fileID: 2100000, guid: 71d8ee1a0187b464d9f599771f8a8047, type: 2}
+    overrideMaterial: {fileID: 0}
     overrideMaterialPassIndex: 0
     overrideShader: {fileID: 0}
     overrideShaderPassIndex: 0
-    overrideMode: 1
-    overrideDepthState: 0
-    depthCompareFunction: 6
-    enableWrite: 0
+    overrideMode: 0
+    overrideDepthState: 1
+    depthCompareFunction: 4
+    enableWrite: 1
     stencilSettings:
       overrideStencilState: 1
       stencilReference: 2
-      stencilCompareFunction: 6
+      stencilCompareFunction: 5
       passOperation: 0
       failOperation: 0
       zFailOperation: 0
@@ -131,7 +131,7 @@ MonoBehaviour:
     overrideShaderPassIndex: 0
     overrideMode: 1
     overrideDepthState: 1
-    depthCompareFunction: 2
+    depthCompareFunction: 8
     enableWrite: 0
     stencilSettings:
       overrideStencilState: 0
@@ -174,8 +174,8 @@ MonoBehaviour:
   - {fileID: -6615079010513175555}
   - {fileID: -508470278402522120}
   - {fileID: 7467936332296002130}
-  - {fileID: -633548159829259212}
-  m_RendererFeatureMap: 4f26fa3bb7acf407fd3b3829b08432a4f843f9ccf98cf1f8529abc038770a367344c46294e2f35f7
+  - {fileID: -1379291690559554488}
+  m_RendererFeatureMap: 4f26fa3bb7acf407fd3b3829b08432a4f843f9ccf98cf1f8529abc038770a36748bc8ce683c5dbec
   m_UseNativeRenderPass: 0
   xrSystemData: {fileID: 0}
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}

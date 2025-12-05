@@ -72,35 +72,55 @@
             }
 
             // -------- Fragment --------
-            half4 frag(Varyings IN) : SV_Target
-            {
-                float dist = distance(IN.worldPos, _SpherePosition);
+half4 frag(Varyings IN) : SV_Target
+{
+    // Distance from sphere center
+    float dist = distance(IN.worldPos, _SpherePosition);
 
-                float2 uv = IN.worldPos.xz * _NoiseScale;
-                float n = (noise(uv) + noise(uv*2.3) + noise(uv*4.1)) / 3.0;
+    // Basic spherical falloff
+    float falloff = saturate((_SphereRadius - dist) / _SphereRadius);
 
-                float falloff = saturate((_SphereRadius - dist) / _SphereRadius);
-                float blend = falloff + n * 0.5;
-                float mask = smoothstep(_NoiseThreshold, _NoiseThreshold + 0.15, blend);
+    // World–space noise (your old one)
+    float2 uv = IN.worldPos.xz * _NoiseScale;
+    float n = (noise(uv) + noise(uv * 2.3) + noise(uv * 4.1)) / 3.0;
 
-                if (mask < 0.5)
-                    discard;
+    float blend = falloff + n * 0.5;
 
-                // camera → player → pixel validation
-                float3 viewDir = _PlayerWorldPos - _CameraWorldPos;
-                float3 toPixel = IN.worldPos - _CameraWorldPos;
+    float mask = smoothstep(_NoiseThreshold, _NoiseThreshold + 0.15, blend);
 
-                float proj = dot(toPixel, normalize(viewDir));
-                float viewLength = length(viewDir);
-                if (proj < 0 || proj > viewLength)
-                    discard;
+    // If pixel is OUTSIDE the cutout, do not write stencil
+    if (mask < 0.5)
+        discard;
 
-                float cosAngle = dot(normalize(toPixel), normalize(viewDir));
-                if (cosAngle < _ViewConeCos)
-                    discard;
+    //
+    // ---------------------------------------------------------
+    //   ✔ CORRECT DEPTH TEST FOR MULTIPLE OCCLUDABLES
+    //   Only cut objects BETWEEN Camera → Player
+    // ---------------------------------------------------------
+    //
 
-                return 0;
-            }
+    float3 camToPlayer = _PlayerWorldPos - _CameraWorldPos;
+    float3 camToPixel  = IN.worldPos - _CameraWorldPos;
+
+    // Normalize direction toward player
+    float3 viewDir = normalize(camToPlayer);
+
+    // Projection of pixel and player onto camera→player direction
+    float projPixel  = dot(camToPixel, viewDir);
+    float projPlayer = dot(camToPlayer, viewDir);
+
+    // Pixel is BEFORE camera → discard (never cut)
+    if (projPixel < 0.0)
+        discard;
+
+    // Pixel is BEHIND player → discard (never cut)
+    if (projPixel > projPlayer)
+        discard;
+
+    // Everything here passes → WRITE STENCIL
+    return 0;
+}
+
             ENDHLSL
         }
     }
