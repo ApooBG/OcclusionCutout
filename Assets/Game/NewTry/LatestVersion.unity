@@ -228,25 +228,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &135843328 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1612966681441836458, guid: efce2e36b20fc4440a156d882fb1d865, type: 3}
-  m_PrefabInstance: {fileID: 1261710202}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &135843332
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 135843328}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6ca297b55064653468b0ee831586e1c8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  player: {fileID: 566785933}
-  playerWorldPosProperty: _PlayerWorldPos
 --- !u!4 &135843333 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4272576621282673912, guid: efce2e36b20fc4440a156d882fb1d865, type: 3}
@@ -270,7 +251,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &229933505
 Transform:
   m_ObjectHideFlags: 0
@@ -482,11 +463,6 @@ MonoBehaviour:
   m_LightCookieSize: {x: 1, y: 1}
   m_LightCookieOffset: {x: 0, y: 0}
   m_SoftShadowQuality: 1
---- !u!4 &566785933 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 61374443321512129, guid: efce2e36b20fc4440a156d882fb1d865, type: 3}
-  m_PrefabInstance: {fileID: 1261710202}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &653019769
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -549,7 +525,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 122612316485938567, guid: 55d03af97665b8c4fbce2e5da0011489, type: 3}
       propertyPath: m_Layer
-      value: 7
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 122612316485938567, guid: 55d03af97665b8c4fbce2e5da0011489, type: 3}
       propertyPath: m_IsActive
@@ -1173,23 +1149,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3779730475400850670, guid: efce2e36b20fc4440a156d882fb1d865, type: 3}
       propertyPath: smoothSpeed
-      value: 15.97
+      value: 10.4
       objectReference: {fileID: 0}
     - target: {fileID: 3779730475400850670, guid: efce2e36b20fc4440a156d882fb1d865, type: 3}
       propertyPath: sphereRange
-      value: 3.63
+      value: 2.91
       objectReference: {fileID: 0}
     - target: {fileID: 3779730475400850670, guid: efce2e36b20fc4440a156d882fb1d865, type: 3}
       propertyPath: positionOffset.x
-      value: -0.26
+      value: -0.22
       objectReference: {fileID: 0}
     - target: {fileID: 3779730475400850670, guid: efce2e36b20fc4440a156d882fb1d865, type: 3}
       propertyPath: positionOffset.y
-      value: 0.26
+      value: 1.09
       objectReference: {fileID: 0}
     - target: {fileID: 3779730475400850670, guid: efce2e36b20fc4440a156d882fb1d865, type: 3}
       propertyPath: positionOffset.z
-      value: 0.81
+      value: 0.83
       objectReference: {fileID: 0}
     - target: {fileID: 4721832569386158863, guid: efce2e36b20fc4440a156d882fb1d865, type: 3}
       propertyPath: m_LocalPosition.y
@@ -1271,17 +1247,15 @@ PrefabInstance:
       propertyPath: m_LocalPosition.z
       value: 2.78
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 720520206159944270, guid: efce2e36b20fc4440a156d882fb1d865, type: 3}
     m_RemovedGameObjects:
     - {fileID: 5989490666264210170, guid: efce2e36b20fc4440a156d882fb1d865, type: 3}
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 4272576621282673912, guid: efce2e36b20fc4440a156d882fb1d865, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1862281656}
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 1612966681441836458, guid: efce2e36b20fc4440a156d882fb1d865, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 135843332}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: efce2e36b20fc4440a156d882fb1d865, type: 3}
 --- !u!4 &1261710203 stripped
 Transform:
