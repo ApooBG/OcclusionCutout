@@ -4,7 +4,6 @@
     {
         _NoiseScale ("Noise Scale", Float) = 1.0
         _NoiseThreshold ("Noise Threshold", Float) = 0.5
-        _ViewConeCos("View Cone Cosine", Range(0,1)) = 0.8
     }
 
     SubShader
@@ -40,7 +39,6 @@
             float  _NoiseThreshold;
             float3 _CameraWorldPos;
             float3 _PlayerWorldPos;
-            float  _ViewConeCos;
 
             // -------- Noise Helpers --------
             float hash(float2 p)
@@ -104,18 +102,6 @@ half4 frag(Varyings IN) : SV_Target
 
     // Normalize direction toward player
     float3 viewDir = normalize(camToPlayer);
-
-    // Projection of pixel and player onto camera→player direction
-    float projPixel  = dot(camToPixel, viewDir);
-    float projPlayer = dot(camToPlayer, viewDir);
-
-    // Pixel is BEFORE camera → discard (never cut)
-    if (projPixel < 0.0)
-        discard;
-
-    // Pixel is BEHIND player → discard (never cut)
-    if (projPixel > projPlayer)
-        discard;
 
     // Everything here passes → WRITE STENCIL
     return 0;

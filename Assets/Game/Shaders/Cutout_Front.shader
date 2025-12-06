@@ -4,7 +4,6 @@
     {
         _NoiseScale ("Noise Scale", Float) = 1.0
         _NoiseThreshold ("Noise Threshold", Float) = 0.5
-        _ViewConeCos("View Cone Cosine", Range(0,1)) = 0.8
     }
 
     SubShader
@@ -40,7 +39,6 @@
             float  _NoiseThreshold;
             float3 _CameraWorldPos;
             float3 _PlayerWorldPos;
-            float  _ViewConeCos;
 
             // -------- Noise Helpers --------
             float hash(float2 p)
@@ -84,19 +82,6 @@
                 float mask = smoothstep(_NoiseThreshold, _NoiseThreshold + 0.15, blend);
 
                 if (mask < 0.5)
-                    discard;
-
-                // camera → player → pixel validation
-                float3 viewDir = _PlayerWorldPos - _CameraWorldPos;
-                float3 toPixel = IN.worldPos - _CameraWorldPos;
-
-                float proj = dot(toPixel, normalize(viewDir));
-                float viewLength = length(viewDir);
-                if (proj < 0 || proj > viewLength)
-                    discard;
-
-                float cosAngle = dot(normalize(toPixel), normalize(viewDir));
-                if (cosAngle < _ViewConeCos)
                     discard;
 
                 return 0;

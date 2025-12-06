@@ -150,16 +150,6 @@
                 if (mask < 0.5)
                     discard;
 
-                // Optional: only cut along camera → player segment (like your original)
-                float3 viewDir  = _PlayerWorldPos - _CameraWorldPos;
-                float3 toPixel  = IN.worldPos      - _CameraWorldPos;
-
-                float viewLen   = length(viewDir);
-                float proj      = dot(toPixel, normalize(viewDir));
-
-                if (proj < 0.0 || proj > viewLen)
-                    discard;
-
                 // We only care about stencil, not color
                 return 0;
             }
