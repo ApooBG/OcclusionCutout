@@ -37,8 +37,6 @@
             float  _SphereRadius;
             float  _NoiseScale;
             float  _NoiseThreshold;
-            float3 _CameraWorldPos;
-            float3 _PlayerWorldPos;
 
             // -------- Noise Helpers --------
             float hash(float2 p)
@@ -70,42 +68,29 @@
             }
 
             // -------- Fragment --------
-half4 frag(Varyings IN) : SV_Target
-{
-    // Distance from sphere center
-    float dist = distance(IN.worldPos, _SpherePosition);
+            half4 frag(Varyings IN) : SV_Target
+            {
+                // Distance from sphere center
+                float dist = distance(IN.worldPos, _SpherePosition);
 
-    // Basic spherical falloff
-    float falloff = saturate((_SphereRadius - dist) / _SphereRadius);
+                // Basic spherical falloff
+                float falloff = saturate((_SphereRadius - dist) / _SphereRadius);
 
-    // World–space noise (your old one)
-    float2 uv = IN.worldPos.xz * _NoiseScale;
-    float n = (noise(uv) + noise(uv * 2.3) + noise(uv * 4.1)) / 3.0;
+                // World–space noise (your old one)
+                float2 uv = IN.worldPos.xz * _NoiseScale;
+                float n = (noise(uv) + noise(uv * 2.3) + noise(uv * 4.1)) / 3.0;
 
-    float blend = falloff + n * 0.5;
+                float blend = falloff + n * 0.5;
 
-    float mask = smoothstep(_NoiseThreshold, _NoiseThreshold + 0.15, blend);
+                float mask = smoothstep(_NoiseThreshold, _NoiseThreshold + 0.15, blend);
 
-    // If pixel is OUTSIDE the cutout, do not write stencil
-    if (mask < 0.5)
-        discard;
+                // If pixel is OUTSIDE the cutout, do not write stencil
+                if (mask < 0.5)
+                    discard;
 
-    //
-    // ---------------------------------------------------------
-    //   ✔ CORRECT DEPTH TEST FOR MULTIPLE OCCLUDABLES
-    //   Only cut objects BETWEEN Camera → Player
-    // ---------------------------------------------------------
-    //
-
-    float3 camToPlayer = _PlayerWorldPos - _CameraWorldPos;
-    float3 camToPixel  = IN.worldPos - _CameraWorldPos;
-
-    // Normalize direction toward player
-    float3 viewDir = normalize(camToPlayer);
-
-    // Everything here passes → WRITE STENCIL
-    return 0;
-}
+                // Everything here passes → WRITE STENCIL
+                return 0;
+            }
 
             ENDHLSL
         }
